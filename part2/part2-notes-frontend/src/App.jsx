@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import personsService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([{ name: "Arto Hellas" }]);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    personsService
+      .getAll()
+      .then((initialPersons) => setPersons(initialPersons));
+  }, []);
 
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(search),
@@ -19,18 +26,35 @@ const App = () => {
       alert(`enter a name`);
       return;
     }
+    const newPerson = {
+      name: newName,
+      phone: newPhone,
+    };
     if (persons.find((person) => person.name === newName)) {
-      alert(`${newName} is already added to the phonebook`);
+      const confirmed = window.confirm(
+        `${newName} already exist in the phonebook, replace old number with the new one ?`,
+      );
+      if (!confirmed) return;
+      const personToUpdate = persons.find((person) => person.name === newName);
+      personsService
+        .update(personToUpdate.id, newPerson)
+        .then((updatedPerson) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === updatedPerson.id ? updatedPerson : person,
+            ),
+          );
+          setNewName("");
+          setNewPhone("");
+        });
     } else if (persons.find((person) => person.phone === newPhone)) {
       alert(`${newPhone} is already added to the phonebook`);
     } else {
-      const newPerson = {
-        name: newName,
-        phone: newPhone,
-      };
-      setPersons([...persons, newPerson]);
-      setNewName("");
-      setNewPhone("");
+      personsService.create(newPerson).then((personCreated) => {
+        setPersons([...persons, personCreated]);
+        setNewName("");
+        setNewPhone("");
+      });
     }
   };
 
@@ -49,11 +73,19 @@ const App = () => {
     setSearch(e.target.value);
   };
 
+  const handleDelete = (id) => {
+    const personToDelete = persons.find((person) => person.id === id);
+    const confirmed = window.confirm(`Delete ${personToDelete.name} ?`);
+    if (!confirmed) return;
+    personsService.deleteOne(id).then((deletedPerson) => {
+      setPersons((currentPersons) =>
+        currentPersons.filter((person) => person.id !== deletedPerson.id),
+      );
+    });
+  };
+
   return (
     <div>
-      <div>
-        newname: {newName} newPhone: {newPhone}
-      </div>
       <h2>Phonebook</h2>
       <Filter
         value={search}
@@ -68,7 +100,10 @@ const App = () => {
         handlePhoneChange={handlePhoneChange}
       />
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons
+        filteredPersons={filteredPersons}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };
