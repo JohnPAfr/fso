@@ -1,0 +1,17 @@
+.notification-error {
+  background: lightcoral;
+  font-size: 20px;
+  border: solid 1px red;
+  border-radius: 2px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.notification-success {
+  background: lightgreen;
+  font-size: 20px;
+  border: solid 1px green;
+  border-radius: 2px;
+  padding: 10px;
+  margin-bottom: 10px;
+}

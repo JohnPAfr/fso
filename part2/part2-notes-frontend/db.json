@@ -9,6 +9,36 @@
       "name": "bonjoureuh",
       "phone": "222",
       "id": "6_Z1y7tm5C4"
+    },
+    {
+      "name": "toto",
+      "phone": "1234",
+      "id": "-eU7lo64Rs8"
+    },
+    {
+      "name": "tata",
+      "phone": "12345",
+      "id": "cf492CIFS_Y"
+    },
+    {
+      "name": "tatata",
+      "phone": "111",
+      "id": "bVczrnPbvfY"
+    },
+    {
+      "name": "gogo",
+      "phone": "444",
+      "id": "4cnfsYAYe0Y"
+    },
+    {
+      "name": "test",
+      "phone": "3333",
+      "id": "H75X4TFZj9U"
+    },
+    {
+      "name": "gzeiughiu",
+      "phone": "456789",
+      "id": "hBzqx-VscqE"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
