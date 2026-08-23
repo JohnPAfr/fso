@@ -39,7 +39,7 @@ const App = () => {
     }
     const newPerson = {
       name: newName,
-      phone: newPhone,
+      number: newPhone,
     };
     if (persons.find((person) => person.name === newName)) {
       const confirmed = window.confirm(
