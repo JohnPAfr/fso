@@ -1,6 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+
+const Person = require("./models/mongo.js");
 
 app.use(express.json());
 app.use(express.static("dist"));
@@ -10,29 +13,6 @@ morgan.token("body", (req) => {
 });
 
 app.use(morgan(":method :url :status :response-time ms :body"));
-
-let phonebook = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
 
 const generateId = () => {
   const maxId =
@@ -45,7 +25,9 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-  return response.status(200).json(phonebook);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.post("/api/persons", (request, response) => {
@@ -79,29 +61,34 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const person = {
-    id: generateId(),
-    name: body.content.name,
-    number: body.content.number,
-  };
+  Person.findOne({ name: body.name }).then((person) => {
+    if (person) {
+      return response.status(400).json({
+        error: "name must be unique",
+      });
+    }
 
-  phonebook = phonebook.concat(person);
+    const newPerson = new Person({
+      name: body.name,
+      number: body.number,
+    });
 
-  response.json(note);
+    newPerson.save().then((savedPerson) => {
+      response.json(savedPerson);
+    });
+  });
 });
 
 app.get("/api/persons/:id", (req, res) => {
   const id = req.params.id;
-  const person = phonebook.find((person) => person.id === id);
-  if (!person) return res.status(404);
-  return res.status(200).json(person);
-});
-
-app.delete("/api/notes/:id", (request, response) => {
-  const id = request.params.id;
-  phonebook = phonebook.filter((person) => person.id !== id);
-
-  response.status(204).end();
+  Person.findOne({ id }).then((person) => {
+    if (!person) {
+      return response.status(400).json({
+        error: "Not in the phonebook",
+      });
+    }
+    response.json(person);
+  });
 });
 
 app.get("/api/info", (req, res) => {
