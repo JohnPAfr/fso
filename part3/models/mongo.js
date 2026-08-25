@@ -40,4 +40,4 @@ personSchema.set("toJSON", {
 //   });
 // }
 
-modules.export = mongoose.model("Person", personSchema);
+module.export = mongoose.model("Person", personSchema);
