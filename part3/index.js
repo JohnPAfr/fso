@@ -6,6 +6,11 @@ const app = express();
 
 const Person = require("./models/mongo.js");
 
+console.log(Person);
+console.log(typeof Person);
+console.log(typeof Person.find);
+console.log(require.resolve("./models/mongo.js"));
+
 app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
