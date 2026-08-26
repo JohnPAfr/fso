@@ -102,9 +102,9 @@ const App = () => {
     const personToDelete = persons.find((person) => person.id === id);
     const confirmed = window.confirm(`Delete ${personToDelete.name} ?`);
     if (!confirmed) return;
-    personsService.deleteOne(id).then((deletedPerson) => {
+    personsService.deleteOne(id).then(() => {
       setPersons((currentPersons) =>
-        currentPersons.filter((person) => person.id !== deletedPerson.id),
+        currentPersons.filter((person) => person.id !== id),
       );
     });
   };

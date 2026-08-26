@@ -6,11 +6,6 @@ const app = express();
 
 const Person = require("./models/mongo.js");
 
-console.log(Person);
-console.log(typeof Person);
-console.log(typeof Person.find);
-console.log(require.resolve("./models/mongo.js"));
-
 app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
@@ -34,31 +29,15 @@ app.get("/api/persons", (request, response) => {
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
-  if (!body.content) {
-    return response.status(400).json({
-      error: "content missing",
-    });
-  }
-
-  if (!body.content.name) {
+  if (!body.name) {
     return response.status(400).json({
       error: "name missing",
     });
   }
 
-  if (!body.content.number) {
+  if (!body.number) {
     return response.status(400).json({
       error: "number missing",
-    });
-  }
-
-  const nameExist = phonebook.find(
-    (person) => person.name === body.content.name,
-  );
-
-  if (nameExist) {
-    return response.status(400).json({
-      error: "name must be unique",
     });
   }
 
@@ -80,12 +59,12 @@ app.post("/api/persons", (request, response) => {
   });
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
   Person.findById(id)
     .then((person) => {
       if (!person) {
-        return response.status(404).end();
+        return res.status(404).end();
       }
       response.json(person);
     })
@@ -119,14 +98,17 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/api/info", (req, res) => {
-  const ppl = phonebook.length;
+app.get("/api/info", (req, res, next) => {
   const date = new Date();
 
-  return res.send(`
-    <p>The phonebook has ${ppl} people</p>
-    <p>${date}</p>
-    `);
+  Person.countDocuments({})
+    .then((ppl) => {
+      res.send(`
+        <p>The phonebook has ${ppl} people</p>
+        <p>${date}</p>
+        `);
+    })
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
