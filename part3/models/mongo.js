@@ -1,21 +1,31 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI
 
-mongoose.set("strictQuery", false);
-mongoose.connect(url, { family: 4 });
+mongoose.set('strictQuery', false)
+mongoose.connect(url, { family: 4 })
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: Number,
-});
-
-personSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
+  name: { type: String, minLength: 3, required: true },
+  number: {
+    type: Number,
+    minLength: 8,
+    validate: {
+      validator: function (v) {
+        return /^(?=.{8,}$)\d{2,3}-\d+$/.test(v)
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+    required: true,
   },
-});
+})
 
-module.exports = mongoose.model("Person", personSchema);
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  },
+})
+
+module.exports = mongoose.model('Person', personSchema)
