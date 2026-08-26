@@ -63,23 +63,29 @@ const App = () => {
           setNewPhone("");
         })
         .catch((error) => {
-          console.log(error);
+          console.log("err", error?.response?.data.error);
           setNotificationState("error");
-          triggerNotification(`${error}`);
-          setPersons(persons.filter((person) => person.id !== error.id));
+          triggerNotification(`${error?.response?.data.error}`);
         });
     } else if (persons.find((person) => person.phone === newPhone)) {
       alert(`${newPhone} is already added to the phonebook`);
     } else {
-      personsService.create(newPerson).then((personCreated) => {
-        setPersons([...persons, personCreated]);
-        setNotificationState("success");
-        triggerNotification(
-          `${newPerson.name} has been added to the phone book`,
-        );
-        setNewName("");
-        setNewPhone("");
-      });
+      personsService
+        .create(newPerson)
+        .then((personCreated) => {
+          setPersons([...persons, personCreated]);
+          setNotificationState("success");
+          triggerNotification(
+            `${newPerson.name} has been added to the phone book`,
+          );
+          setNewName("");
+          setNewPhone("");
+        })
+        .catch((error) => {
+          console.log("err", error?.response?.data.error);
+          setNotificationState("error");
+          triggerNotification(`${error?.response?.data.error}`);
+        });
     }
   };
 
