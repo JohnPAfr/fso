@@ -3,20 +3,21 @@ const Blog = require("../models/blog");
 
 blogRoutes.get("/", async (request, response) => {
   const blogs = await Blog.find({});
-  if (blogs) {
-    response.json(blogs);
+  if (blogs.length === 0) {
+    return response.sendStatus(404);
   }
+  response.json(blogs);
 });
 
 blogRoutes.post("/", async (request, response) => {
   if (!request.body) {
-    return;
+    return response.sendStatus(404);
   }
 
   const keys = Object.keys(request.body);
 
   if (!keys.includes("title") || !keys.includes("url")) {
-    response.sendStatus(400);
+    return response.sendStatus(400);
   }
 
   const newObj = {
@@ -31,26 +32,33 @@ blogRoutes.post("/", async (request, response) => {
   const saved = await blog.save();
   if (saved) {
     response.status(201).json(saved);
+  } else {
+    response.sendStatus(500);
   }
 });
 
 blogRoutes.get("/:id", async (request, response) => {
-  if (!request.body) {
-    return;
+  const blog = await Blog.findOne({ _id: request.params.id });
+  if (!blog) {
+    return response.sendStatus(404);
   }
-  const blog = await Blog.find({ id: request.params.id });
-  if (blog) {
-    response.json(blog);
-  }
+  response.json(blog);
 });
 
 blogRoutes.patch("/:id", async (request, response) => {
   if (!request.body) {
-    response.sendStatus(404);
+    return response.sendStatus(400);
   }
 
-  await Blog.updateOne({ _id: request.params.id }, { $set: request.body });
-  response.sendStatus(201);
+  const result = await Blog.updateOne(
+    { _id: request.params.id },
+    { $set: request.body },
+  );
+
+  if (result.matchedCount === 0) {
+    return response.sendStatus(404);
+  }
+  response.sendStatus(204);
 });
 
 blogRoutes.delete("/:id", async (request, response) => {

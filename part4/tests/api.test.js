@@ -102,16 +102,27 @@ test("delete by Id", async () => {
 
   const blogsAtEnd = await helper.blogsInDb();
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+
+  const blog = blogsAtEnd.find((b) => b.id === "5a422aa71b54a676234d17f8");
+  assert.strictEqual(blog, undefined);
 });
 
 test("update likes on one blog", async () => {
   const fieldsToUpdate = {
     likes: 666,
+    title: "Modified title",
+    author: "Jojo",
+    url: "je sais pas",
   };
   await api
     .patch("/api/blog/5a422aa71b54a676234d17f8")
     .send(fieldsToUpdate)
     .expect(201);
+
+  const blogs = await helper.blogsInDb();
+  const blog = blogs.find((b) => b.id === "5a422aa71b54a676234d17f8");
+
+  assert.strictEqual(blog.likes, fieldsToUpdate.likes);
 });
 
 after(async () => {
