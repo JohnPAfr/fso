@@ -42,12 +42,12 @@ blogRoutes.get("/:id", async (request, response) => {
 });
 
 blogRoutes.delete("/:id", async (request, response) => {
-  const deleted = await Blog.deleteOne({ id: request.params.id });
+  const deleted = await Blog.deleteOne({ _id: request.params.id });
 
-  console.log("DELETED ========", deleted);
-
-  if (deleted) {
+  if (deleted.deletedCount > 0) {
     response.sendStatus(204);
+  } else {
+    response.sendStatus(404);
   }
 });
 

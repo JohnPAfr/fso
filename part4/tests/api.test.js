@@ -98,7 +98,7 @@ test("body without url or title return 400", async () => {
 });
 
 test("delete by Id", async () => {
-  await api.delete("/api/blog/id='5a422aa71b54a676234d17f8'").expect(204);
+  await api.delete("/api/blog/5a422aa71b54a676234d17f8").expect(204);
 
   const blogsAtEnd = await helper.blogsInDb();
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
