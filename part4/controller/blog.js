@@ -35,10 +35,22 @@ blogRoutes.post("/", async (request, response) => {
 });
 
 blogRoutes.get("/:id", async (request, response) => {
+  if (!request.body) {
+    return;
+  }
   const blog = await Blog.find({ id: request.params.id });
   if (blog) {
     response.json(blog);
   }
+});
+
+blogRoutes.patch("/:id", async (request, response) => {
+  if (!request.body) {
+    response.sendStatus(404);
+  }
+
+  await Blog.updateOne({ _id: request.params.id }, { $set: request.body });
+  response.sendStatus(201);
 });
 
 blogRoutes.delete("/:id", async (request, response) => {

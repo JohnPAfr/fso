@@ -104,6 +104,16 @@ test("delete by Id", async () => {
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
 });
 
+test("update likes on one blog", async () => {
+  const fieldsToUpdate = {
+    likes: 666,
+  };
+  await api
+    .patch("/api/blog/5a422aa71b54a676234d17f8")
+    .send(fieldsToUpdate)
+    .expect(201);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
